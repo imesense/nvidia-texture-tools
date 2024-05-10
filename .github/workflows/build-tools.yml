@@ -1,0 +1,86 @@
+name: 'Build tools'
+
+on:
+  push:
+    branches:
+      - '**'
+    paths:
+      - '.github/workflows/**'
+      - 'cmake/**'
+      - 'extern/**'
+      - 'project/**'
+      - 'src/**'
+      - '**/CMakeLists.txt'
+      - '**/configure'
+  pull_request:
+    branches:
+      - '**'
+    paths:
+      - '.github/workflows/**'
+      - 'cmake/**'
+      - 'extern/**'
+      - 'project/**'
+      - 'src/**'
+      - '**/CMakeLists.txt'
+      - '**/configure'
+
+jobs:
+  build-windows:
+    name: 'Build Windows'
+
+    strategy:
+      matrix:
+        system:
+          - windows-2022
+        config:
+          - Debug
+          - Release
+        platform:
+          - Win32
+          - x64
+
+    runs-on: ${{ matrix.system }}
+
+    env:
+      NvttSolution: project\vc2017\nvtt.sln
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build tools
+        shell: pwsh
+        run: |
+          msbuild $env:NvttSolution `
+            -p:Configuration=${{ matrix.config }} `
+            -p:Platform=${{ matrix.platform }}
+
+  build-unix:
+    name: 'Build Unix'
+
+    strategy:
+      matrix:
+        system:
+          - ubuntu-22.04
+          - macos-14
+        config:
+          - debug
+          - release
+
+    runs-on: ${{ matrix.system }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build tools
+        run: |
+          ./configure --${{ matrix.config }}
+          make
