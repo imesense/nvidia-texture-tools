@@ -26,9 +26,13 @@
 #ifndef SQUISH_SIMD_SSE_H
 #define SQUISH_SIMD_SSE_H
 
+#if defined(__APPLE__) && defined(__aarch64__)
+#include "../../src/sse2neon.h"
+#else
 #include <xmmintrin.h>
 #if ( SQUISH_USE_SSE > 1 )
 #include <emmintrin.h>
+#endif
 #endif
 
 #define SQUISH_SSE_SPLAT( a )                                        \

@@ -322,7 +322,13 @@ public:
 };
 
 #include <stdio.h>
+
+#if defined(__APPLE__) && defined(__aarch64__)
+#include "../../../src/sse2neon.h"
+#else
 #include "xmmintrin.h"
+#endif
+
 #include <math.h>
 #include <float.h> 
 
